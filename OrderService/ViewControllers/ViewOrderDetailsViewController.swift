@@ -33,7 +33,7 @@ class ViewOrderDetailViewController : UIViewController
             oderDateLabel?.text = displayOrder!.orderDate
             deliveryDateLabel?.text = displayOrder!.DeliveryDate
             var orderString : String = ""
-            for order in displayOrder!.orderList!
+            for order in displayOrder!.orderList
             {
                 let stringToAppend = order.productType! + "    " + String(order.Quantity!) + "\n"
                 orderString.append(stringToAppend)

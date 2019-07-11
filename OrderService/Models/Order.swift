@@ -17,7 +17,7 @@ class Order : Decodable
     
     var DeliveryDate : String?
     
-    var orderList : Array<Product>?
+    var orderList : Array<Product> = []
     
     init() {
         customer = Customer()

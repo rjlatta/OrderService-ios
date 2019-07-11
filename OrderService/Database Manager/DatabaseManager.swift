@@ -69,7 +69,8 @@ class DatabaseManager
     func insertRow(connection : OpaquePointer, id : Int32, name : String, address : String, orderDate : String, deliveryDate : String, orderList : String)
     {
         //let insertStatementString = "INSERT INTO Orders (Id, Name, Address, OrderDate, DeliveryDate, OrderList) VALUES (?, ?, ?, ?, ?, ?);"
-        let insertStatementString = "INSERT INTO Orders (Id, Name, Address, OrderDate, DeliveryDate, OrderList) VALUES (\(id), \(name), \(address), \(orderDate), \(deliveryDate), \(orderList));"
+        let insertStatementString = "INSERT INTO Orders (Id, Name, Address, OrderDate, DeliveryDate, OrderList) VALUES (\(id), \'\(name)\', \'\(address)\', \'\(orderDate)\', \'\(deliveryDate)\', \'\(orderList)\');"
+        //let insertStatementString = "INSERT INTO Orders (Name, Address, OrderDate, DeliveryDate, OrderList) VALUES (\'\(name)\', \'\(address)\', \'\(orderDate)\', \'\(deliveryDate)\', \'\(orderList)\');"
         var insertStatement : OpaquePointer? = nil
         
         if sqlite3_prepare_v2(connection, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK
@@ -100,7 +101,7 @@ class DatabaseManager
     
     func deleteRow(connection : OpaquePointer, row : Int) -> Bool
     {
-        var deleteStatementString = "DELETE FROM Orders WHERE Id = \(row)"
+        let deleteStatementString = "DELETE FROM Orders WHERE Id = \(row)"
         var deleteStatement : OpaquePointer? = nil
         if sqlite3_prepare_v2(connection, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK
         {
@@ -119,6 +120,30 @@ class DatabaseManager
             sqlite3_finalize(deleteStatement)
             return false
         }
+    }
+    
+    func deleteAllData(connection : OpaquePointer)
+    {
+        let deleteStatementString = "DELETE FROM Orders"
+        var deleteStatement : OpaquePointer? = nil
+        if sqlite3_prepare_v2(connection, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK
+        {
+            if(sqlite3_step(deleteStatement) == SQLITE_DONE)
+            {
+                
+                
+            }
+            else
+            {
+                
+              
+            }
+        }
+        else{
+            
+           
+        }
+        sqlite3_finalize(deleteStatement)
     }
     
     func queryDataBase(connection : OpaquePointer) -> Array<Order>
@@ -156,12 +181,26 @@ class DatabaseManager
                     if let data = removeEscapingCharacters.data(using: .utf8)
                     {
                         do{
-                            let dict =  try JSONSerialization.jsonObject(with: data, options: []) as? [String:[String:String]]
-                            if let extractList = dict!["customerOrder"] //as? [ Product ]
+                            let dict =  try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject]
+                            if let extractList = dict!["customerOrder"] as? [[String:AnyObject]]
                             {
-                                //order.orderList = extractList
-                                print("test")
+                                for product in extractList
+                                {
+                                    let newProduct = Product()
+                                    if let productName = product["productType"] as? String
+                                    {
+                                        newProduct.productType = productName
+                                    }
+                                    if let productQuantity = product["quantity"] as? Int
+                                    {
+                                        newProduct.Quantity = productQuantity
+                                    }
+                                    order.orderList.append(newProduct)
+                                }
+                                print("TEST")
                             }
+                            
+            
                         }
                         catch let error{
                             print(error)

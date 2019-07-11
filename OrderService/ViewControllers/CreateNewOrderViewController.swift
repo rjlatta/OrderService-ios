@@ -9,6 +9,10 @@
 import UIKit
 import Foundation
 
+protocol ReturnNewOrderDelegate {
+    func NewOrderResponse(order : Order)
+}
+
 class CreateNewOrderViewController: UIViewController {
 
     @IBOutlet var customerNameField : UITextField?
@@ -31,6 +35,8 @@ class CreateNewOrderViewController: UIViewController {
     
     @IBOutlet var cancelNewOrder : UIButton?
     
+    var delegate : ReturnNewOrderDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -38,7 +44,7 @@ class CreateNewOrderViewController: UIViewController {
     
     @IBAction func commitNewOrder()
     {
-        var newOrder : Order = Order()
+        let newOrder : Order = Order()
         if(customerNameField?.text?.count != 0 && customerAddressField?.text?.count != 0 && orderDateField?.text?.count != 0 && deliveryDateField?.text?.count != 0)
         {
             newOrder.customer?.Name = customerNameField?.text
@@ -49,34 +55,45 @@ class CreateNewOrderViewController: UIViewController {
             if(productOneField?.text?.count != 0)
             {
                 let product : Product = Product()
-                product.productType = ""
+                product.productType = "Widget"
                 product.Quantity = Int((productOneField?.text!)!)
                 newOrderList.append(product)
             }
             if(productTwoField?.text?.count != 0)
             {
                 let product : Product = Product()
-                product.productType = ""
+                product.productType = "Thinga ma bob"
                 product.Quantity = Int((productTwoField?.text!)!)
                 newOrderList.append(product)
             }
             if(productThreeField?.text?.count != 0)
             {
                 let product : Product = Product()
-                product.productType = ""
+                product.productType = "Whatcha ma callit"
                 product.Quantity = Int((productThreeField?.text!)!)
                 newOrderList.append(product)
             }
             if(productFourField?.text?.count != 0)
             {
                 let product : Product = Product()
-                product.productType = ""
+                product.productType = "Whatcha ma Hoosit"
                 product.Quantity = Int((productFourField?.text!)!)
                 newOrderList.append(product)
             }
             newOrder.orderList = newOrderList
             
-            //return newOrder Here
+            
+            if(delegate != nil)
+            {
+                delegate?.NewOrderResponse(order: newOrder)
+                self.navigationController?.popViewController(animated: true)
+                
+            }
+            else
+            {
+                //should never be nil
+            }
+            
         }
         else
         {
